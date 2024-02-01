@@ -1,0 +1,22 @@
+<launch>
+    <param name="robot_description" command="$(find xacro)/xacro.py $(find mpc_tracking)/urdf/autolabor_robot.urdf.xacro" />
+
+    <!-- 启动 gazebo -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+
+    <!-- 在 gazebo 中显示机器人模型 -->
+    <node pkg="gazebo_ros" type="spawn_model" name="model" args="-urdf -model mycar -param robot_description"  />
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="static_transform_publisher" args="0 0 0 -1.57 0 -1.57 /support /support_depth" />
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mpc_tracking)/config/show_robot.rviz" />
+    <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" output="screen" />
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" />
+    <!-- <node pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" name="joint_state_publisher_gui" output="screen" /> -->
+
+    <node name="arbotix" pkg="arbotix_python" type="arbotix_driver" output="screen">
+        <rosparam file="$(find mpc_tracking)/config/arbotix_control_params.yaml" command="load" />
+        <param name="sim" value="true" />
+    </node>
+
+</launch>
